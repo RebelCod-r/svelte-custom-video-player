@@ -3,17 +3,20 @@
 	import { FaSolidPlay, FaSolidPause } from 'svelte-icons-pack/fa';
 	import { VscMute, VscUnmute } from 'svelte-icons-pack/vsc';
 	import { RiMediaFullscreenLine, RiMediaFullscreenExitFill } from 'svelte-icons-pack/ri';
+	import { onMount } from 'svelte';
 
 	let paused;
 	let muted;
 	let isFullScreen = false;
 	let videoContainerElement;
-	let time = 0;
+	let currentTime = 0;
 	let duration = 0;
 	let progressbarElement;
 	let progressPlayed = 0;
 	let playerContainer =
 		typeof window !== 'undefined' ? document.querySelector('.player-container') : null;
+	let showControls = true;
+	let controlsTimeout;
 
 	const togglePlay = () => {
 		paused = !paused;
@@ -66,7 +69,7 @@
 	};
 
 	const handleTimeUpdate = () => {
-		const playedPercent = (time / duration) * 100;
+		const playedPercent = (currentTime / duration) * 100;
 		progressPlayed = playedPercent;
 	};
 
@@ -85,7 +88,7 @@
 		const playedPercent = (timeInSeconds / duration) * 100;
 
 		progressPlayed = playedPercent;
-		time = timeInSeconds;
+		currentTime = timeInSeconds;
 	};
 
 	const onProgressDragStop = () => {
@@ -100,7 +103,19 @@
 		playerContainer.addEventListener('mousemove', scrubVideo);
 		document.addEventListener('mouseup', onProgressDragStop);
 	};
+
+	const onKeyDown = (event) => {
+		if (event.key === 'f') {
+			toggleFullScreen();
+		}
+
+		if (event.key === ' ') {
+			togglePlay();
+		}
+	};
 </script>
+
+<svelte:window on:keydown={onKeyDown} />
 
 <div class="bg-gray-200 h-screen flex items-center justify-center">
 	<div
@@ -112,7 +127,7 @@
 			bind:paused
 			bind:muted
 			bind:duration
-			bind:currentTime={time}
+			bind:currentTime
 			on:timeupdate={handleTimeUpdate}
 			on:click={togglePlay}
 		>
@@ -120,48 +135,50 @@
 			<source src="/demo-video.mp4" type="video/mp4" />
 		</video>
 
-		<div class="absolute w-full bottom-0 left-0 bg-[#00000086]">
-			<div class="w-full px-2">
-				<div
-					class="h-1 bg-gray-700 rounded-lg relative cursor-pointer"
-					role="presentation"
-					bind:this={progressbarElement}
-					on:mousedown={handleProgressDrag}
-				>
+		{#if showControls}
+			<div class="absolute w-full bottom-0 left-0 bg-[#00000086]">
+				<div class="w-full px-2">
 					<div
-						class="absolute h-full bg-white rounded-lg"
-						role="progressbar"
-						aria-label="played"
-						style="width: {progressPlayed}%"
-					></div>
-				</div>
-			</div>
-
-			<div class="h-14 flex justify-between items-center px-4">
-				<div class="flex items-center gap-4">
-					<button on:click={togglePlay}>
-						<Icon color="#ffffff" src={paused ? FaSolidPlay : FaSolidPause} size="22px" />
-					</button>
-
-					<button on:click={toggleAudio}>
-						<Icon src={muted ? VscMute : VscUnmute} color="#ffffff" size="22px" />
-					</button>
-
-					<div>
-						<p class="text-white">{formatVideoTime(time)} / {formatVideoTime(duration)}</p>
+						class="h-1 bg-gray-700 rounded-lg relative cursor-pointer"
+						role="presentation"
+						bind:this={progressbarElement}
+						on:mousedown={handleProgressDrag}
+					>
+						<div
+							class="absolute h-full bg-white rounded-lg"
+							role="progressbar"
+							aria-label="played"
+							style="width: {progressPlayed}%"
+						></div>
 					</div>
 				</div>
 
-				<div>
-					<button on:click={toggleFullScreen}>
-						<Icon
-							color="#ffffff"
-							src={isFullScreen ? RiMediaFullscreenExitFill : RiMediaFullscreenLine}
-							size="22px"
-						/>
-					</button>
+				<div class="h-14 flex justify-between items-center px-4">
+					<div class="flex items-center gap-4">
+						<button on:click={togglePlay}>
+							<Icon color="#ffffff" src={paused ? FaSolidPlay : FaSolidPause} size="22px" />
+						</button>
+
+						<button on:click={toggleAudio}>
+							<Icon src={muted ? VscMute : VscUnmute} color="#ffffff" size="22px" />
+						</button>
+
+						<div>
+							<p class="text-white">{formatVideoTime(currentTime)} / {formatVideoTime(duration)}</p>
+						</div>
+					</div>
+
+					<div>
+						<button on:click={toggleFullScreen}>
+							<Icon
+								color="#ffffff"
+								src={isFullScreen ? RiMediaFullscreenExitFill : RiMediaFullscreenLine}
+								size="22px"
+							/>
+						</button>
+					</div>
 				</div>
 			</div>
-		</div>
+		{/if}
 	</div>
 </div>
