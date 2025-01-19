@@ -84,7 +84,9 @@
 
 <svelte:window on:keydown={onKeyDown} />
 
-<div class="bg-gray-200 h-screen flex items-center justify-center">
+<div class="bg-gray-200 h-screen flex flex-col items-center justify-center">
+	<p class="text-3xl mb-4 underline">Custom Video Player</p>
+
 	<div
 		class="relative w-3/4 h-3/4 bg-black flex items-center justify-center overflow-hidden"
 		bind:this={videoContainer}
