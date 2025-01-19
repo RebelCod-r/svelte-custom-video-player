@@ -35,31 +35,23 @@
 	};
 
 	const toggleFullScreen = () => {
-		if (
-			document.fullscreenElement ||
-			document.webkitFullscreenElement ||
-			document.msFullscreenElement
-		) {
-			// Exit fullscreen mode
+		if (document.fullscreenElement || document.webkitFullscreenElement) {
+			// exit fullscreen mode
 
 			if (document.exitFullscreen) {
 				document.exitFullscreen();
 			} else if (document.webkitExitFullscreen) {
 				document.webkitExitFullscreen();
-			} else if (document.msExitFullscreen) {
-				document.msExitFullscreen();
 			}
 
 			isFullScreen = false;
 		} else {
-			// Enter fullscreen mode
+			// enter fullscreen mode
 
 			if (videoContainer.requestFullscreen) {
 				videoContainer.requestFullscreen();
-			} else if (videoContainer.webkitRequestFullscreen) {
-				videoContainer.webkitRequestFullscreen();
-			} else if (videoContainer.msRequestFullscreen) {
-				videoContainer.msRequestFullscreen();
+			} else if (videoContainer.webkitRequestfullscreen) {
+				videoContainer.webkitRequestfullscreen();
 			}
 
 			isFullScreen = true;
